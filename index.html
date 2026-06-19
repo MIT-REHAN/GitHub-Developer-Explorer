@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Explorer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1><i class="fab fa-github"></i> GitHub Explorer</h1>
+                <p class="subtitle">Multi-Endpoint API Explorer</p>
+            </div>
+            <div class="header-right">
+                <div class="rate-limit">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span id="rateLimitText">Loading...</span>
+                </div>
+                <button id="refreshRateBtn" class="refresh-btn">
+                    <i class="fas fa-sync"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fab fa-github search-icon"></i>
+                <input type="text" id="usernameInput" placeholder="Enter GitHub username (e.g., octocat)"
+                    class="search-input" />
+                <button id="searchBtn" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            <div id="searchFeedback" class="feedback"></div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profileSection" class="profile-section hidden">
+            <div class="profile-card">
+                <img id="avatarImg" src="" alt="Avatar" class="avatar" />
+                <div class="profile-info">
+                    <div class="profile-header">
+                        <h2 id="profileName">—</h2>
+                        <span id="profileLogin" class="username">@—</span>
+                    </div>
+                    <p id="profileBio" class="bio">—</p>
+                    <div class="stats">
+                        <span><i class="fas fa-users"></i> <span id="followers">0</span> followers</span>
+                        <span><i class="fas fa-user-plus"></i> <span id="following">0</span> following</span>
+                        <span><i class="fas fa-code"></i> <span id="publicRepos">0</span> repos</span>
+                    </div>
+                </div>
+                <a id="profileLink" href="#" target="_blank" class="github-link">
+                    View on GitHub <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Repositories Section -->
+        <section id="reposSection" class="repos-section hidden">
+            <div class="repos-header">
+                <h3><i class="fas fa-book-open"></i> Repositories <span id="repoCount"></span></h3>
+                <div class="sort-control">
+                    <label for="sortSelect">Sort by:</label>
+                    <select id="sortSelect" class="sort-select">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="stars">⭐ Stars</option>
+                        <option value="updated">Recently Updated</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Language Chart -->
+            <div class="lang-chart">
+                <div class="chart-header">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Language Breakdown</span>
+                </div>
+                <div id="langBars" class="lang-bars">
+                    <span class="text-gray-400">No language data</span>
+                </div>
+            </div>
+
+            <!-- Repository Table -->
+            <div class="table-wrapper">
+                <table class="repo-table">
+                    <thead>
+                        <tr>
+                            <th>Repository</th>
+                            <th class="hide-mobile">Language</th>
+                            <th class="text-right">⭐</th>
+                            <th class="text-right hide-tablet">Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repoTableBody">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="repoFeedback" class="repo-feedback"></div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span>⚡ GitHub REST API · Projecte by Pulak and Rehan)</span>
+            <span><i class="fas fa-code"></i> Design and UI by Rehan and API fetch and api key by Pulak</span>
+        </footer>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
