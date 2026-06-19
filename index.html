@@ -4,123 +4,257 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GitHub Explorer</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>GitHub Developer Explorer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/style.css" />
 </head>
 
 <body>
-    <div class="container">
+    <div class="app-container">
         <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <h1><i class="fab fa-github"></i> GitHub Explorer</h1>
-                <p class="subtitle">Multi-Endpoint API Explorer</p>
-            </div>
-            <div class="header-right">
-                <div class="rate-limit">
-                    <i class="fas fa-hourglass-half"></i>
-                    <span id="rateLimitText">Loading...</span>
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <i class="fab fa-github"></i>
                 </div>
-                <button id="refreshRateBtn" class="refresh-btn">
-                    <i class="fas fa-sync"></i>
+                <div>
+                    <h1>DevExplorer</h1>
+                    <p class="subtitle">Multi-Endpoint GitHub Analytics</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="tokenBtn" class="action-btn" title="Configure GitHub Token">
+                    <i class="fas fa-key"></i>
+                    <span class="btn-text">API Token</span>
+                </button>
+                <div class="rate-limit-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <span id="rateLimitText">60 / 60</span>
+                </div>
+                <button id="refreshRateBtn" class="icon-btn" title="Refresh Rate Limit">
+                    <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Search Section -->
+        <!-- Search Section & Quick Links -->
         <section class="search-section">
             <div class="search-box">
-                <i class="fab fa-github search-icon"></i>
-                <input type="text" id="usernameInput" placeholder="Enter GitHub username (e.g., octocat)"
-                    class="search-input" />
+                <div class="input-wrapper">
+                    <i class="fas fa-search search-input-icon"></i>
+                    <input type="text" id="usernameInput" placeholder="Enter GitHub username (e.g., gaearon, yyx990803)..." />
+                </div>
                 <button id="searchBtn" class="search-btn">
-                    <i class="fas fa-search"></i> Search
+                    <span>Analyze Profile</span>
+                    <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
-            <div id="searchFeedback" class="feedback"></div>
+            <div id="searchFeedback" class="feedback-msg"></div>
+            
+            <div class="quick-links">
+                <span class="quick-label">Try exploring:</span>
+                <button class="quick-user-btn" data-username="gaearon">gaearon</button>
+                <button class="quick-user-btn" data-username="yyx990803">yyx990803</button>
+                <button class="quick-user-btn" data-username="torvalds">torvalds</button>
+                <button class="quick-user-btn" data-username="tj">tj</button>
+            </div>
         </section>
 
-        <!-- Profile Section -->
-        <section id="profileSection" class="profile-section hidden">
-            <div class="profile-card">
-                <img id="avatarImg" src="" alt="Avatar" class="avatar" />
-                <div class="profile-info">
-                    <div class="profile-header">
-                        <h2 id="profileName">—</h2>
-                        <span id="profileLogin" class="username">@—</span>
+        <!-- Main Workspace Grid (Hidden initially, shown when profile loads) -->
+        <div id="workspaceGrid" class="workspace-grid hidden">
+            <!-- Left Side: Profile Information -->
+            <aside class="sidebar-layout">
+                <!-- Profile Details -->
+                <section id="profileSection" class="dashboard-card profile-card">
+                    <div class="profile-main">
+                        <div class="avatar-container">
+                            <img id="avatarImg" src="" alt="User Avatar" class="profile-avatar" />
+                            <a id="profileLink" href="#" target="_blank" class="github-profile-link" title="Open GitHub Profile">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                        <div class="profile-names">
+                            <h2 id="profileName">—</h2>
+                            <span id="profileLogin" class="profile-username">@—</span>
+                        </div>
                     </div>
-                    <p id="profileBio" class="bio">—</p>
-                    <div class="stats">
-                        <span><i class="fas fa-users"></i> <span id="followers">0</span> followers</span>
-                        <span><i class="fas fa-user-plus"></i> <span id="following">0</span> following</span>
-                        <span><i class="fas fa-code"></i> <span id="publicRepos">0</span> repos</span>
+                    
+                    <p id="profileBio" class="profile-bio">—</p>
+
+                    <!-- Expanded Metadata Stats -->
+                    <div class="profile-metadata">
+                        <div class="meta-item" id="metaCompanyContainer">
+                            <i class="fas fa-briefcase"></i>
+                            <span id="profileCompany">—</span>
+                        </div>
+                        <div class="meta-item" id="metaLocationContainer">
+                            <i class="fas fa-location-dot"></i>
+                            <span id="profileLocation">—</span>
+                        </div>
+                        <div class="meta-item" id="metaBlogContainer">
+                            <i class="fas fa-link"></i>
+                            <a id="profileBlog" href="#" target="_blank">—</a>
+                        </div>
+                        <div class="meta-item" id="metaTwitterContainer">
+                            <i class="fab fa-twitter"></i>
+                            <span id="profileTwitter">—</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="far fa-calendar-alt"></i>
+                            <span>Joined <span id="profileJoined">—</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Analytic Counts -->
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-num" id="followers">0</span>
+                            <span class="stat-label">Followers</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num" id="following">0</span>
+                            <span class="stat-label">Following</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num" id="publicRepos">0</span>
+                            <span class="stat-label">Repos</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num" id="totalStars">0</span>
+                            <span class="stat-label">Stars Rec.</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num" id="totalForks">0</span>
+                            <span class="stat-label">Forks Rec.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Organizations Section -->
+                <section id="orgsSection" class="dashboard-card orgs-card hidden">
+                    <h3 class="card-title"><i class="fas fa-users-rectangle"></i> Organizations</h3>
+                    <div id="orgsList" class="orgs-grid">
+                        <!-- Dynamic Organization Logos -->
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Right Side: Analytics and Repository List -->
+            <main class="main-content-layout">
+                <!-- Language Breakdown Visualizer -->
+                <section class="dashboard-card chart-card">
+                    <h3 class="card-title"><i class="fas fa-chart-pie"></i> Language Breakdown</h3>
+                    
+                    <!-- Color track bar -->
+                    <div class="lang-track-bar-container">
+                        <div id="langTrackBar" class="lang-track-bar"></div>
+                    </div>
+
+                    <!-- Expanded Legend Grid -->
+                    <div id="langBars" class="lang-legend-grid">
+                        <!-- Legend and percentages -->
+                    </div>
+                </section>
+
+                <!-- Repositories Listing Dashboard -->
+                <section id="reposSection" class="dashboard-card repos-card">
+                    <div class="repos-card-header">
+                        <div class="header-title-area">
+                            <h3><i class="fas fa-folder-open"></i> Repositories</h3>
+                            <span id="repoCount" class="repo-badge">0</span>
+                        </div>
+                        
+                        <!-- Search and filter controls -->
+                        <div class="filter-controls">
+                            <div class="filter-search-wrapper">
+                                <i class="fas fa-filter"></i>
+                                <input type="text" id="repoSearchInput" placeholder="Filter repositories..." />
+                            </div>
+                            
+                            <div class="select-group">
+                                <select id="repoTypeSelect" class="styled-select">
+                                    <option value="all">All Types</option>
+                                    <option value="source">Sources</option>
+                                    <option value="fork">Forks</option>
+                                </select>
+                                
+                                <select id="sortSelect" class="styled-select">
+                                    <option value="stars">⭐ Stars</option>
+                                    <option value="updated">Recently Updated</option>
+                                    <option value="forks">🍴 Forks</option>
+                                    <option value="name">Name (A-Z)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Repository List Table / Sleek Grid -->
+                    <div class="repo-table-container">
+                        <table class="repo-table">
+                            <thead>
+                                <tr>
+                                    <th>Repository</th>
+                                    <th>Language</th>
+                                    <th class="text-right">Stars</th>
+                                    <th class="text-right">Forks</th>
+                                    <th class="text-right hide-mobile">Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repoTableBody">
+                                <!-- Dynamic Repository Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="repoFeedback" class="repo-footer-feedback"></div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Token Settings Modal -->
+        <div id="tokenModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> GitHub Token Configuration</h3>
+                    <button id="closeTokenModal" class="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">
+                        To bypass the unauthenticated rate limit of <strong>60 requests/hour</strong>, you can add a 
+                        GitHub Personal Access Token (PAT). This increases your rate limit to <strong>5,000 requests/hour</strong>.
+                    </p>
+                    <div class="info-alert">
+                        <i class="fas fa-info-circle"></i>
+                        <span>No permissions (scopes) are required for your token. It is stored <strong>locally in your browser</strong> and is only sent directly to GitHub's secure API.</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tokenInput">Personal Access Token (classic or fine-grained)</label>
+                        <input type="password" id="tokenInput" placeholder="ghp_..." />
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button id="clearTokenBtn" class="danger-btn">Clear Token</button>
+                        <button id="saveTokenBtn" class="primary-btn">Save & Apply</button>
                     </div>
                 </div>
-                <a id="profileLink" href="#" target="_blank" class="github-link">
-                    View on GitHub <i class="fas fa-external-link-alt"></i>
-                </a>
             </div>
-        </section>
-
-        <!-- Repositories Section -->
-        <section id="reposSection" class="repos-section hidden">
-            <div class="repos-header">
-                <h3><i class="fas fa-book-open"></i> Repositories <span id="repoCount"></span></h3>
-                <div class="sort-control">
-                    <label for="sortSelect">Sort by:</label>
-                    <select id="sortSelect" class="sort-select">
-                        <option value="name">Name (A-Z)</option>
-                        <option value="stars">⭐ Stars</option>
-                        <option value="updated">Recently Updated</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Language Chart -->
-            <div class="lang-chart">
-                <div class="chart-header">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Language Breakdown</span>
-                </div>
-                <div id="langBars" class="lang-bars">
-                    <span class="text-gray-400">No language data</span>
-                </div>
-            </div>
-
-            <!-- Repository Table -->
-            <div class="table-wrapper">
-                <table class="repo-table">
-                    <thead>
-                        <tr>
-                            <th>Repository</th>
-                            <th class="hide-mobile">Language</th>
-                            <th class="text-right">⭐</th>
-                            <th class="text-right hide-tablet">Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody id="repoTableBody">
-                        <!-- Dynamic rows -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="repoFeedback" class="repo-feedback"></div>
-        </section>
+        </div>
 
         <!-- Footer -->
-        <footer class="footer">
-            <span>⚡ GitHub REST API · Projecte by Pulak and Rehan)</span>
-            <span><i class="fas fa-code"></i> Design and UI by Rehan and API fetch and api key by Pulak</span>
+        <footer class="app-footer">
+            <p>⚡ Powered by GitHub REST API</p>
+            <p>Built with Vanilla JS & CSS Grid · Dynamic Rate-Limit Optimization</p>
         </footer>
     </div>
 
     <!-- JavaScript Files -->
-    <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="src/app.js"></script>
 </body>
 
 </html>
